@@ -421,11 +421,26 @@
             });
             
             // すべて表示ボタン
-            const viewAllButton = document.querySelector('.view-all-btn');
-            viewAllButton.addEventListener('click', function() {
-                alert('全レビュー一覧画面は開発中です');
-            });
-        });
+            // ダッシュボードの「詳細」ボタンだけにイベントを適用
+const detailButtons = document.querySelectorAll('.btn-default');
+detailButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        alert('詳細表示機能は開発中です');
+    });
+});
+
+// 「返信する」ボタンのイベントは削除（aタグのデフォルト動作に任せる）
+// または以下のように変更してリンク先に移動するようにする
+
+const replyButtons = document.querySelectorAll('a.btn-primary');
+replyButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+        // デフォルトのアラート動作を防止
+        // e.preventDefault();
+        // アラートの代わりに移動
+        window.location.href = 'zayro-review-detail.html';
+    });
+
     </script>
 </body>
 </html>
