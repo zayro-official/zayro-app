@@ -19,12 +19,13 @@
             });
         });
         
-        // 「返信する」ボタンのイベント - リンク先に移動
+        // 「返信する」ボタンのイベント - aタグのデフォルト動作を活かす
+        // 念のためイベントリスナーを設定し、古いアラート動作を上書き
         const replyButtons = document.querySelectorAll('a.btn-primary');
         replyButtons.forEach(button => {
             button.addEventListener('click', function(e) {
-                // アラートの代わりに移動（aタグのデフォルト動作でも移動するが念のため）
-                window.location.href = 'zayro-review-detail.html';
+                // アラートは表示せず、aタグのデフォルト動作に任せる
+                // window.location.href = 'zayro-review-detail.html'; // aタグが正しく設定されていれば不要
             });
         });
         
