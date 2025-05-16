@@ -292,3 +292,8 @@ CORSエラー: フロントエンドとバックエンドの連携時に発生�
 GitHub リポジトリ: zayro-official/zayro-app
 GitHub Pages: https://zayro-official.github.io/zayro-app/
 APIドキュメント: http://127.0.0.1:8000/docs (ローカル環境のみ)
+
+✅ APIエンドポイントの概要（例: GET /reviews - レビュー一覧取得）
+✅ 環境構築手順（例: pip install fastapi uvicorn）
+✅ 起動コマンド（例: uvicorn simple_main:app --reload）
+✅ 主要なデータモデル構造（JSONなどで簡潔に）
