@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZAYRO - レビュー詳細と返信</title>
+    <style>
+        /* 基本スタイル */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        /* ヘッダー */
+        .header {
+            background-color: #3f51b5;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .language-selector {
+            background-color: white;
+            color: #3f51b5;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        /* メインコンテンツ */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+        
+        /* サイドバー */
+        .sidebar {
+            width: 200px;
+            background-color: #2c3e50;
+            color: white;
+        }
+        
+        .menu-item {
+            padding: 15px 20px;
+            cursor: pointer;
+        }
+        
+        .menu-item.active {
+            background-color: #34495e;
+        }
+        
+        /* メインエリア */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: #3f51b5;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* レビュー詳細カード */
+        .review-detail {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .customer-info {
+            flex: 1;
+        }
+        
+        .customer-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .review-meta {
+            display: flex;
+            margin-top: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .review-date, .review-platform {
+            margin-right: 15px;
+        }
+        
+        .star-rating {
+            font-size: 24px;
+            color: #ddd;
+        }
+        
+        .star-rating .star.filled {
+            color: gold;
+        }
+        
+        .review-content {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .review-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .tag {
+            background-color: #f0f0f0;
+            color: #666;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        
+        .sentiment-tag {
+            font-weight: bold;
+        }
+        
+        .sentiment-positive {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .sentiment-negative {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .sentiment-neutral {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        /* 顧客情報セクション */
+        .customer-details {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .customer-details h2 {
+            margin-top: 0;
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .customer-history {
+            border-top: 1px solid #eee;
+            margin-top: 15px;
+            padding-top: 15px;
+        }
+        
+        .visit-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .visit-date {
+            font-weight: bold;
+        }
+        
+        .visit-details {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* 返信セクション */
+        .reply-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .reply-section h2 {
+            margin-top: 0;
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .reply-templates {
+            margin-bottom: 15px;
+        }
+        
+        .template-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            margin-bottom: 10px;
+        }
+        
+        .reply-editor {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .reply-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .reply-options {
+            display: flex;
+            align-items: center;
+        }
+        
+        .reply-options label {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .reply-options input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background-color: #3f51b5;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: #333;
+            margin-right: 10px;
+        }
+        
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                display: flex;
+                overflow-x: auto;
+            }
+            
+            .menu-item {
+                padding: 15px;
+            }
+            
+            .review-header {
+                flex-direction: column;
+            }
+            
+            .star-rating {
+                margin-top: 10px;
+            }
+            
+            .reply-actions {
+                flex-direction: column;
+            }
+            
+            .reply-options {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <div class="header">
+        <div class="logo">ZAYRO</div>
+        <select class="language-selector">
+            <option>日本語</option>
+            <option>English</option>
+            <option>Español</option>
+        </select>
+    </div>
+    
+    <!-- メインコンテンツ -->
+    <div class="container">
+        <!-- サイドバー -->
+        <div class="sidebar">
+            <div class="menu-item">ダッシュボード</div>
+            <div class="menu-item active">レビュー一覧</div>
+            <div class="menu-item">設定</div>
+        </div>
+        
+        <!-- メインエリア -->
+        <div class="main-content">
+            <a href="zayro-dashboard.html" class="back-link">
+                ← ダッシュボードに戻る
+            </a>
+            
+            <h1>レビュー詳細と返信</h1>
+            
+            <!-- レビュー詳細 -->
+            <div class="review-detail">
+                <div class="review-header">
+                    <div class="customer-info">
+                        <div class="customer-name">山田太郎</div>
+                        <div class="review-meta">
+                            <div class="review-date">2025/05/10</div>
+                            <div class="review-platform">Google</div>
+                        </div>
+                    </div>
+                    <div class="star-rating">
+                        <span class="star filled">★</span>
+                        <span class="star filled">★</span>
+                        <span class="star filled">★</span>
+                        <span class="star filled">★</span>
+                        <span class="star">★</span>
+                    </div>
+                </div>
+                
+                <div class="review-content">
+                    とても良いレストランでした。料理も美味しく、スタッフも親切でした。特に刺身の盛り合わせが新鮮で絶品でした。ただ、少し混雑していたので、予約をしておくことをお勧めします。また機会があれば訪問したいと思います。
+                </div>
+                
+                <div class="review-tags">
+                    <div class="tag sentiment-tag sentiment-positive">ポジティブ評価</div>
+                    <div class="tag">料理の質</div>
+                    <div class="tag">接客</div>
+                    <div class="tag">混雑</div>
+                </div>
+            </div>
+            
+            <!-- 顧客情報 -->
+            <div class="customer-details">
+                <h2>顧客情報</h2>
+                <div>名前: 山田太郎</div>
+                <div>レビュー回数: 2回</div>
+                <div>平均評価: 4.5星</div>
+                
+                <div class="customer-history">
+                    <h3>来店履歴</h3>
+                    <div class="visit-item">
+                        <div class="visit-date">2025/05/05</div>
+                        <div class="visit-details">ディナー、4名、予約あり</div>
+                    </div>
+                    <div class="visit-item">
+                        <div class="visit-date">2025/03/20</div>
+                        <div class="visit-details">ランチ、2名、予約なし</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 返信セクション -->
+            <div class="reply-section">
+                <h2>レビューに返信</h2>
+                
+                <div class="reply-templates">
+                    <select class="template-select">
+                        <option value="">テンプレートを選択...</option>
+                        <option value="thank-positive">ポジティブレビューへのお礼</option>
+                        <option value="apology-service">サービスへの苦情対応</option>
+                        <option value="apology-food">料理への苦情対応</option>
+                        <option value="invite-back">再来店の勧誘</option>
+                    </select>
+                </div>
+                
+                <textarea class="reply-editor" placeholder="レビューへの返信を入力してください...">山田様
+
+この度は当寿司レストランにご来店いただき、誠にありがとうございます。また、素敵なレビューもお寄せいただき、大変嬉しく思っております。
+
+刺身の盛り合わせをお楽しみいただけたようで、シェフ一同大変喜んでおります。私たちは常に新鮮な食材を提供することを心がけておりますので、ご満足いただけて光栄です。
+
+ご指摘いただいた混雑に関しては、特に週末はご予約をお勧めしております。お客様により快適にお食事をお楽しみいただけるよう、サービス向上に努めてまいります。
+
+またのご来店を心よりお待ちしております。
+
+敬具
+寿司レストラン ZAYRO
+支配人 鈴木</textarea>
+                
+                <div class="reply-actions">
+                    <div class="reply-options">
+                        <label>
+                            <input type="checkbox" checked> テンプレートを保存
+                        </label>
+                        <label>
+                            <input type="checkbox" checked> AIによる自動校正を有効化
+                        </label>
+                    </div>
+                    
+                    <div class="reply-buttons">
+                        <button class="btn btn-secondary">下書き保存</button>
+                        <button class="btn btn-primary">返信を送信</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // シンプルなインタラクション
+        document.addEventListener('DOMContentLoaded', function() {
+            // テンプレート選択の処理
+            const templateSelect = document.querySelector('.template-select');
+            const replyEditor = document.querySelector('.reply-editor');
+            
+            const templates = {
+                'thank-positive': `お客様
+
+この度は当寿司レストランにご来店いただき、誠にありがとうございます。また、素敵なレビューもお寄せいただき、大変嬉しく思っております。
+
+お客様のお言葉は、私たちのモチベーションとなります。これからもお客様にご満足いただけるよう、より一層サービスの向上に努めてまいります。
+
+またのご来店を心よりお待ちしております。
+
+敬具
+寿司レストラン ZAYRO
+支配人 鈴木`,
+                'apology-service': `お客様
+
+この度は当寿司レストランにご来店いただき、誠にありがとうございます。
+
+サービスに関してご不便をおかけし、心よりお詫び申し上げます。お客様のご指摘は真摯に受け止め、スタッフへの教育を徹底し、サービスの質の向上に努めてまいります。
+
+お客様にご満足いただけるレストランを目指し、精進してまいりますので、またの機会がございましたら、ぜひご来店ください。
+
+敬具
+寿司レストラン ZAYRO
+支配人 鈴木`,
+                'apology-food': `お客様
+
+この度は当寿司レストランにご来店いただき、誠にありがとうございます。
+
+お料理に関してご期待に沿えなかったこと、深くお詫び申し上げます。当店では常に最高品質の食材を使用し、お客様にご満足いただける料理を提供することを心がけております。
+
+お客様からのご意見は、品質向上のための貴重なフィードバックとして受け止め、改善に努めてまいります。
+
+今後ともご愛顧賜りますよう、よろしくお願い申し上げます。
+
+敬具
+寿司レストラン ZAYRO
+支配人 鈴木`,
+                'invite-back': `お客様
+
+この度は当寿司レストランにご来店いただき、誠にありがとうございます。
+
+次回ご来店の際には、より一層ご満足いただけるよう、スタッフ一同心よりお待ちしております。ご予約の際には、お好みやご要望などございましたら、お気軽にお申し付けください。
+
+また、6月より新しい季節のメニューも始まりますので、ぜひご賞味いただければ幸いです。
+
+お客様のまたのご来店を心よりお待ちしております。
+
+敬具
+寿司レストラン ZAYRO
+支配人 鈴木`
+            };
+            
+            templateSelect.addEventListener('change', function() {
+                const selectedTemplate = templateSelect.value;
+                if (selectedTemplate && templates[selectedTemplate]) {
+                    replyEditor.value = templates[selectedTemplate];
+                }
+            });
+            
+            // 送信ボタンのクリックイベント
+            const sendButton = document.querySelector('.btn-primary');
+            sendButton.addEventListener('click', function() {
+                alert('返信が送信されました！');
+                window.location.href = 'zayro-dashboard.html';
+            });
+            
+            // 下書き保存ボタンのクリックイベント
+            const draftButton = document.querySelector('.btn-secondary');
+            draftButton.addEventListener('click', function() {
+                alert('下書きが保存されました！');
+            });
+        });
+    </script>
+</body>
+</html>
