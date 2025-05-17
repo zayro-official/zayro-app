@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>ZAYRO - ダッシュボード</title>
+  <title>ZAYRO – ダッシュボード</title>
 </head>
 <body>
   <h1>レビュー一覧</h1>
@@ -15,11 +15,11 @@
         const list = document.getElementById("review-list");
         data.forEach(review => {
           const item = document.createElement("li");
-          item.textContent = `顧客: ${review.author || "不明"}｜評価: ${review.rating}｜コメント: ${review.comment}`;
+          item.textContent = `顧客: ${review.author} ｜ 評価: ${review.rating}｜コメント: ${review.comment}`;
           list.appendChild(item);
         });
       })
-      .catch(error => console.error("レビュー取得エラー:", error));
+      .catch(error => console.error("レビュー取得エラー：", error));
   </script>
 </body>
 </html>
