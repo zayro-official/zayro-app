@@ -1,5 +1,6 @@
-from fastapi import FastAPI
 import os
+import requests
+from fastapi import FastAPI
 
 app = FastAPI()
 
@@ -9,19 +10,26 @@ def read_root():
 
 @app.get("/reviews/google")
 def get_google_reviews():
-    # 環境変数からキーを取得（仮のtest値対応）
     api_key = os.getenv("GOOGLE_API_KEY", "no_key_set")
     place_id = os.getenv("GOOGLE_PLACE_ID", "no_place_id")
+    
+    url = (
+        f"https://maps.googleapis.com/maps/api/place/details/json"
+        f"?place_id={place_id}&fields=review&key={api_key}"
+    )
 
-    # 仮データを返す（本物のAPI実装は後で）
+    response = requests.get(url)
+    data = response.json()
+
+    reviews = data.get("result", {}).get("reviews", [])
+    simplified_reviews = [
+        {"author": r.get("author_name"), "rating": r.get("rating"), "comment": r.get("text")}
+        for r in reviews
+    ]
+
     return {
         "status": "ok",
         "source": "google",
-        "api_key": api_key,
         "place_id": place_id,
-        "reviews": [
-            {"author": "Taro", "rating": 5, "comment": "最高の寿司でした！"},
-            {"author": "Lisa", "rating": 4, "comment": "雰囲気が良いです。"}
-        ]
+        "reviews": simplified_reviews
     }
-
