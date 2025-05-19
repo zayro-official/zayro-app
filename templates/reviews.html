@@ -58,4 +58,3 @@ def show_reviews(request: Request):
         for r in reviews
     ]
     return templates.TemplateResponse("reviews.html", {"request": request, "reviews": simplified_reviews})
-
