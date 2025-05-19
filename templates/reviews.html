@@ -2,67 +2,70 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>{% if lang == 'ja' %}Googleレビュー{% else %}Google Reviews{% endif %}</title>
+  <title>Google Reviews</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       background-color: #f3f3f3;
-      padding: 20px;
+      padding: 30px 10px;
       margin: 0;
     }
-    .lang-switch {
-      margin-bottom: 10px;
-    }
-    .lang-switch a {
-      margin-right: 10px;
-      text-decoration: none;
-      color: #333;
-    }
-    .lang-switch a.active {
-      font-weight: bold;
-      text-decoration: underline;
-    }
+
     h2 {
       color: #333;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      text-align: center;
     }
+
     .review {
       background-color: #fff;
       border-left: 5px solid #2196f3;
       border-radius: 6px;
-      margin-bottom: 15px;
-      padding: 15px 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+      padding: 20px;
+      margin: 15px auto;
+      max-width: 700px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
+
     .author {
       font-weight: bold;
       font-size: 1.1em;
       margin-bottom: 5px;
+      color: #333;
     }
+
     .rating {
       color: #FFA500;
       margin-bottom: 10px;
       font-weight: bold;
     }
+
     .comment {
       color: #444;
-      line-height: 1.5;
+      line-height: 1.6;
+      font-size: 0.95em;
+    }
+
+    @media (max-width: 600px) {
+      .review {
+        padding: 15px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="lang-switch">
-    <a href="?lang=en" class="{% if lang == 'en' %}active{% endif %}">EN</a>
-    <a href="?lang=ja" class="{% if lang == 'ja' %}active{% endif %}">JA</a>
+  <div style="text-align: center; margin-bottom: 20px;">
+    <a href="?lang=en">EN</a> | <a href="?lang=ja">JA</a>
   </div>
 
-  <h2>{% if lang == 'ja' %}Googleレビュー{% else %}Google Reviews{% endif %}</h2>
+  <h2>{{ "Google Reviews" if lang == "en" else "Googleレビュー" }}</h2>
 
-  {% for review in reviews %}
+  {% for review in reviews|reverse %}
     <div class="review">
       <div class="author">{{ review.author }}</div>
       <div class="rating">
-        {% if lang == 'ja' %}評価: {% else %}Rating: {% endif %}{{ review.rating }}
+        {{ "Rating:" if lang == "en" else "評価:" }} {{ review.rating }} 
+        ({{ "★" * review.rating }})
       </div>
       <div class="comment">{{ review.comment }}</div>
     </div>
