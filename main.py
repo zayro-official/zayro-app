@@ -49,3 +49,15 @@ def show_reviews(request: Request):
         for r in reviews
     ]
     return templates.TemplateResponse("reviews.html", {"request": request, "reviews": simplified_reviews})
+from fastapi.responses import HTMLResponse
+from fastapi import Request
+
+@app.get("/google-reviews", response_class=HTMLResponse)
+async def show_google_reviews(request: Request):
+    api_key = os.getenv("GOOGLE_API_KEY", "no_key_set")
+    place_id = os.getenv("GOOGLE_PLACE_ID", "no_place_id")
+    url = f"https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&fields=reviews&key={api_key}"
+    response = requests.get(url)
+    data = response.json()
+    reviews = data.get("result", {}).get("reviews", [])
+    return templates.TemplateResponse("reviews.html", {"request": request, "reviews": reviews})
