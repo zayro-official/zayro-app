@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Google Reviews</title>
+</head>
+<body>
+  <h1>Googleレビュー一覧</h1>
+  {% for r in reviews %}
+    <div>
+      <strong>{{ r.author }}</strong>：★{{ r.rating }}<br>
+      {{ r.comment }}
+    </div>
+    <hr>
+  {% endfor %}
+</body>
+</html>
