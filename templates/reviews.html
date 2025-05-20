@@ -1,74 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ lang }}">
 <head>
-  <meta charset="UTF-8">
-  <title>Google Reviews</title>
-  <style>
-    body {
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      background-color: #f3f3f3;
-      padding: 30px 10px;
-      margin: 0;
-    }
-
-    h2 {
-      color: #333;
-      margin-bottom: 25px;
-      text-align: center;
-    }
-
-    .review {
-      background-color: #fff;
-      border-left: 5px solid #2196f3;
-      border-radius: 6px;
-      padding: 20px;
-      margin: 15px auto;
-      max-width: 700px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .author {
-      font-weight: bold;
-      font-size: 1.1em;
-      margin-bottom: 5px;
-      color: #333;
-    }
-
-    .rating {
-      color: #FFA500;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-
-    .comment {
-      color: #444;
-      line-height: 1.6;
-      font-size: 0.95em;
-    }
-
-    @media (max-width: 600px) {
-      .review {
-        padding: 15px;
-      }
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ "レビュー一覧" if lang == "ja" else "Reviews" }}</title>
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <div style="text-align: center; margin-bottom: 20px;">
-    <a href="?lang=en">EN</a> | <a href="?lang=ja">JA</a>
-  </div>
-
-  <h2>{{ "Google Reviews" if lang == "en" else "Googleレビュー" }}</h2>
-
-  {% for review in reviews|reverse %}
-    <div class="review">
-      <div class="author">{{ review.author }}</div>
-      <div class="rating">
-        {{ "Rating:" if lang == "en" else "評価:" }} {{ review.rating }} 
-        ({{ "★" * review.rating }})
-      </div>
-      <div class="comment">{{ review.comment }}</div>
+  <div class="container">
+    <div class="lang-switch">
+      <a href="?lang=ja">🇯🇵 日本語</a> | <a href="?lang=en">🇺🇸 English</a>
     </div>
-  {% endfor %}
+
+    <h1>{{ "お客様の声" if lang == "ja" else "Customer Reviews" }}</h1>
+
+    {% if reviews %}
+      {% for review in reviews %}
+        <div class="review-card">
+          <div class="review-header">
+            <strong>{{ review.author_name }}</strong>
+            <span class="rating">{"★" * review.rating}</span>
+          </div>
+          <p class="review-text">{{ review.text }}</p>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="no-reviews">{{ "まだレビューはありません。" if lang == "ja" else "No reviews yet." }}</p>
+    {% endif %}
+  </div>
 </body>
 </html>
