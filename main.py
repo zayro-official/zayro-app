@@ -4,8 +4,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import requests
 import os
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI()
@@ -22,7 +22,6 @@ async def get_reviews(request: Request, lang: str = "en"):
     data = response.json()
     reviews = data.get("result", {}).get("reviews", [])
 
-    # 最新順に並び替え
     sorted_reviews = sorted(reviews, key=lambda x: x.get("time", 0), reverse=True)
 
     return templates.TemplateResponse("reviews.html", {
