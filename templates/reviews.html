@@ -1,50 +1,36 @@
-!DOCTYPE html>
-<html lang="{{ lang }}">
+<!DOCTYPE html>
+<html lang="{{ 'ja' if lang == 'ja' else 'en' }}">
 <head>
-  <meta charset="UTF-8" />
-  <title>Googleレビュー</title>
-  <link rel="stylesheet" href="/static/style.css" />
+    <meta charset="UTF-8">
+    <title>Googleレビュー</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <div class="container">
     <div class="lang-switch">
-      <a href="?lang=ja&mode={{ mode }}">🇯🇵 日本語</a> |
-      <a href="?lang=en&mode={{ mode }}">🇺🇸 English</a>
+        <a href="/?lang=ja&mode={{ mode }}">🇯🇵 日本語</a> | 
+        <a href="/?lang=en&mode={{ mode }}">🇺🇸 English</a>
     </div>
-
     <div class="mode-switch">
-      モード切替：
-      {% if mode == 'auto' %}
-        <strong>AI自動返信</strong> | <a href="?lang={{ lang }}&mode=manual">手動返信</a>
-      {% else %}
-        <a href="?lang={{ lang }}&mode=auto">AI自動返信</a> | <strong>手動返信</strong>
-      {% endif %}
+        モード切替：
+        <a href="/?lang={{ lang }}&mode=ai">AI自動返信</a> |
+        <a href="/?lang={{ lang }}&mode=manual">手動返信</a>
     </div>
 
-    <h1>{{ "レビュー一覧" if lang == "ja" else "Customer Reviews" }}</h1>
+    <h1>{{ "Googleレビュー" if lang == "ja" else "Customer Reviews" }}</h1>
 
     {% for review in reviews %}
-    <div class="review-card">
-      <div class="review-header">
-        <strong>{{ review.author_name }}</strong>
-        <span class="rating">{{ review.stars }}</span>
-      </div>
-      <p class="review-text">{{ review.text }}</p>
+        <div class="review-card">
+            <h3>{{ review.author_name }} ★★★★★</h3>
+            <p>{{ review.text }}</p>
 
-      {% if mode == "auto" %}
-      <div class="reply-box">
-        <strong>{{ "お店からの返信" if lang == "ja" else "Reply from us" }}</strong>
-        <p class="reply-text">{{ review.reply }}</p>
-      </div>
-      {% else %}
-      <div class="manual-reply-form">
-        <strong>返信（下書き）:</strong><br>
-        <textarea rows="3" cols="60" placeholder="ここに返信を書いてください..."></textarea><br>
-        <button disabled>送信（未実装）</button>
-      </div>
-      {% endif %}
-    </div>
+            {% if mode == "ai" %}
+                <p><strong>Reply from us</strong><br>{{ replies[loop.index0] }}</p>
+            {% else %}
+                <p><strong>返信（下書き）：</strong></p>
+                <textarea placeholder="ここに返信を書いてください..." rows="3" cols="50"></textarea><br>
+                <button disabled>送信（未実装）</button>
+            {% endif %}
+        </div>
     {% endfor %}
-  </div>
 </body>
 </html>
