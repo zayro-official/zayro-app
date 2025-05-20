@@ -1,76 +1,89 @@
 import os
 import requests
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from dotenv import load_dotenv
+from pydantic import BaseModel
 from openai import OpenAI
-import json
+from dotenv import load_dotenv
 
 load_dotenv()
 
+app = FastAPI()
+templates = Jinja2Templates(directory="templates")
+
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-GOOGLE_PLACE_ID = os.getenv("GOOGLE_PLACE_ID")
+PLACE_ID = os.getenv("GOOGLE_PLACE_ID")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-PORT = int(os.getenv("PORT", 10000))
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-app = FastAPI()
+class Review(BaseModel):
+    author_name: str
+    rating: int
+    text: str
+    reply_text: str = ""
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
-
-def fetch_reviews():
-    url = f"https://maps.googleapis.com/maps/api/place/details/json?place_id={GOOGLE_PLACE_ID}&fields=reviews&key={GOOGLE_API_KEY}"
-    response = requests.get(url)
-    data = response.json()
-    reviews = data.get("result", {}).get("reviews", [])
-    return reviews
-
-def generate_reply(review_text, lang="ja"):
-    try:
-        prompt = f"以下のレビューに対して、レストランのオーナーとして丁寧な返信を書いてください（日本語）：\n\n「{review_text}」"
-        if lang == "en":
-            prompt = f"As a restaurant owner, write a kind reply to the following review:\n\n\"{review_text}\""
-
-        completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.7
-        )
-        return completion.choices[0].message.content.strip()
-    except Exception as e:
-        return f"(AI返信エラー: {str(e)})"
+stored_replies = {}
+mode = {"value": "ai"}  # "ai" または "manual"
 
 @app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request, lang: str = "ja", mode: str = "auto"):
-    reviews = fetch_reviews()
-    seen = set()
-    filtered_reviews = []
-
-    for review in reviews:
-        review_id = review.get("author_name") + str(review.get("time"))
-        if review_id not in seen:
-            seen.add(review_id)
-            filtered_reviews.append(review)
-
-    enriched_reviews = []
-    for review in filtered_reviews:
-        reply = ""
-        if mode == "auto":
-            reply = generate_reply(review.get("text", ""), lang)
-        enriched_reviews.append({
-            "author_name": review.get("author_name"),
-            "rating": int(review.get("rating", 0)),
-            "text": review.get("text"),
-            "reply": reply
-        })
-
+async def read_root(request: Request, lang: str = "en"):
+    reviews = await fetch_google_reviews()
     return templates.TemplateResponse("reviews.html", {
         "request": request,
-        "reviews": enriched_reviews,
+        "reviews": reviews,
         "lang": lang,
-        "mode": mode
+        "mode": mode["value"]
     })
+
+@app.post("/set_mode")
+async def set_mode(request: Request, mode_value: str = Form(...)):
+    mode["value"] = mode_value
+    return RedirectResponse(url="/", status_code=303)
+
+@app.post("/reply")
+async def reply_to_review(
+    request: Request,
+    author_name: str = Form(...),
+    review_text: str = Form(...),
+    lang: str = Form(...),
+    reply_text: str = Form("")
+):
+    if mode["value"] == "manual":
+        stored_replies[author_name] = reply_text
+    else:
+        try:
+            prompt = f"Respond to the following customer review in a friendly and professional tone:\n\nReview: {review_text}"
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+                max_tokens=150
+            )
+            reply = response.choices[0].message.content.strip()
+            stored_replies[author_name] = reply
+        except Exception as e:
+            stored_replies[author_name] = f"(AI返信エラー: {str(e)})"
+
+    return RedirectResponse(url=f"/?lang={lang}", status_code=303)
+
+async def fetch_google_reviews():
+    url = f"https://maps.googleapis.com/maps/api/place/details/json?place_id={PLACE_ID}&fields=review&key={GOOGLE_API_KEY}"
+    response = requests.get(url)
+    data = response.json()
+    google_reviews = data.get("result", {}).get("reviews", [])
+
+    reviews = []
+    for r in google_reviews:
+        author_name = r.get("author_name")
+        rating = r.get("rating", 0)
+        text = r.get("text", "")
+        reply_text = stored_replies.get(author_name, "")
+        reviews.append(Review(
+            author_name=author_name,
+            rating=rating,
+            text=text,
+            reply_text=reply_text
+        ))
+    return reviews
