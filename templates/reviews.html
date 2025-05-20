@@ -1,32 +1,32 @@
 <!DOCTYPE html>
-<html lang="{{ lang }}">
+<html lang="{{ 'ja' if lang == 'ja' else 'en' }}">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>{{ "レビュー一覧" if lang == "ja" else "Reviews" }}</title>
-  <link rel="stylesheet" href="/static/style.css" />
+    <meta charset="UTF-8">
+    <title>Googleレビュー</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <div class="container">
     <div class="lang-switch">
-      <a href="?lang=ja">🇯🇵 日本語</a> | <a href="?lang=en">🇺🇸 English</a>
+        <a href="?lang=ja">🇯🇵 日本語</a> |
+        <a href="?lang=en">🇺🇸 English</a>
     </div>
+    <h1>
+        {{ "Googleレビュー" if lang == "ja" else "Customer Reviews" }}
+    </h1>
 
-    <h1>{{ "お客様の声" if lang == "ja" else "Customer Reviews" }}</h1>
+    {% for review in reviews %}
+    <div class="review-card">
+        <h3>{{ review.author_name }}</h3>
+        <p class="rating">評価: {{ review.rating }} 
+            {% for i in range(review.rating|int) %}★{% endfor %}
+        </p>
+        <p>{{ review.text }}</p>
 
-    {% if reviews %}
-      {% for review in reviews %}
-        <div class="review-card">
-          <div class="review-header">
-            <strong>{{ review.author_name }}</strong>
-            <span class="rating">{"★" * review.rating}</span>
-          </div>
-          <p class="review-text">{{ review.text }}</p>
+        <div class="reply">
+            <strong>{{ "返信" if lang == "ja" else "Reply" }}:</strong><br>
+            {{ review.reply }}
         </div>
-      {% endfor %}
-    {% else %}
-      <p class="no-reviews">{{ "まだレビューはありません。" if lang == "ja" else "No reviews yet." }}</p>
-    {% endif %}
-  </div>
+    </div>
+    {% endfor %}
 </body>
 </html>
