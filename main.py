@@ -1,6 +1,38 @@
-review_data = []
+import os
+import openai
+import requests
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from dotenv import load_dotenv
+
+load_dotenv()
+
+app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+GOOGLE_PLACE_ID = os.getenv("GOOGLE_PLACE_ID")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+PORT = int(os.getenv("PORT", 10000))
+
+openai.api_key = OPENAI_API_KEY
+
+@app.get("/reviews", response_class=HTMLResponse)
+async def get_reviews(request: Request, lang: str = "en", mode: str = "auto"):
+    AUTO_REPLY_MODE = mode == "auto"
+
+    url = f"https://maps.googleapis.com/maps/api/place/details/json?place_id={GOOGLE_PLACE_ID}&fields=reviews&key={GOOGLE_API_KEY}"
+    response = requests.get(url)
+    data = response.json()
+
+    reviews = data.get("result", {}).get("reviews", [])
+
+    review_data = []
     for review in reviews:
-        # フィルター解除（original_language を無視）
         reply = None
 
         if AUTO_REPLY_MODE:
@@ -24,3 +56,10 @@ review_data = []
             "text": review.get("text"),
             "reply": reply,
         })
+
+    return templates.TemplateResponse("reviews.html", {
+        "request": request,
+        "reviews": review_data,
+        "lang": lang,
+        "mode": mode
+    })
