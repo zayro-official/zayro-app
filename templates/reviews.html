@@ -1,32 +1,50 @@
-<!DOCTYPE html>
-<html lang="{{ 'ja' if lang == 'ja' else 'en' }}">
+!DOCTYPE html>
+<html lang="{{ lang }}">
 <head>
-    <meta charset="UTF-8">
-    <title>Googleレビュー</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <title>Googleレビュー</title>
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
+  <div class="container">
     <div class="lang-switch">
-        <a href="?lang=ja">🇯🇵 日本語</a> |
-        <a href="?lang=en">🇺🇸 English</a>
+      <a href="?lang=ja&mode={{ mode }}">🇯🇵 日本語</a> |
+      <a href="?lang=en&mode={{ mode }}">🇺🇸 English</a>
     </div>
-    <h1>
-        {{ "Googleレビュー" if lang == "ja" else "Customer Reviews" }}
-    </h1>
+
+    <div class="mode-switch">
+      モード切替：
+      {% if mode == 'auto' %}
+        <strong>AI自動返信</strong> | <a href="?lang={{ lang }}&mode=manual">手動返信</a>
+      {% else %}
+        <a href="?lang={{ lang }}&mode=auto">AI自動返信</a> | <strong>手動返信</strong>
+      {% endif %}
+    </div>
+
+    <h1>{{ "レビュー一覧" if lang == "ja" else "Customer Reviews" }}</h1>
 
     {% for review in reviews %}
     <div class="review-card">
-        <h3>{{ review.author_name }}</h3>
-        <p class="rating">評価: {{ review.rating }} 
-            {% for i in range(review.rating|int) %}★{% endfor %}
-        </p>
-        <p>{{ review.text }}</p>
+      <div class="review-header">
+        <strong>{{ review.author_name }}</strong>
+        <span class="rating">{{ review.stars }}</span>
+      </div>
+      <p class="review-text">{{ review.text }}</p>
 
-        <div class="reply">
-            <strong>{{ "返信" if lang == "ja" else "Reply" }}:</strong><br>
-            {{ review.reply }}
-        </div>
+      {% if mode == "auto" %}
+      <div class="reply-box">
+        <strong>{{ "お店からの返信" if lang == "ja" else "Reply from us" }}</strong>
+        <p class="reply-text">{{ review.reply }}</p>
+      </div>
+      {% else %}
+      <div class="manual-reply-form">
+        <strong>返信（下書き）:</strong><br>
+        <textarea rows="3" cols="60" placeholder="ここに返信を書いてください..."></textarea><br>
+        <button disabled>送信（未実装）</button>
+      </div>
+      {% endif %}
     </div>
     {% endfor %}
+  </div>
 </body>
 </html>
