@@ -18,7 +18,6 @@ GOOGLE_PLACE_ID = os.getenv("GOOGLE_PLACE_ID")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-# Googleレビュー取得関数（返信も含めて）
 def get_google_reviews():
     url = f"https://maps.googleapis.com/maps/api/place/details/json?place_id={GOOGLE_PLACE_ID}&fields=reviews&key={GOOGLE_API_KEY}"
     response = requests.get(url)
@@ -26,13 +25,11 @@ def get_google_reviews():
     reviews = data.get("result", {}).get("reviews", [])
     return sorted(reviews, key=lambda x: x.get("time", 0), reverse=True)
 
-# AIによる返信生成（返信がない場合のみ）
 def generate_ai_reply(text, lang="ja"):
     prompt = {
         "ja": f"以下のレビューに対して、寿司レストランのオーナーとして丁寧で親しみやすい返信を書いてください：\n\n{text}",
         "en": f"Write a friendly and professional reply to the following sushi restaurant review:\n\n{text}"
     }
-
     try:
         result = client.chat.completions.create(
             model="gpt-4",
@@ -44,30 +41,25 @@ def generate_ai_reply(text, lang="ja"):
     except Exception as e:
         return f"(AI返信エラー: {str(e)})"
 
-# レビュー表示
 @app.get("/reviews", response_class=HTMLResponse)
 async def show_reviews(request: Request):
     lang = request.query_params.get("lang", "en")
+    mode = request.query_params.get("mode", "auto")  # "auto" or "manual"
     reviews = get_google_reviews()
 
     for review in reviews:
         review["stars"] = "★" * int(review.get("rating", 0))
 
-        # 既にオーナー返信があるか？
-        if "author_response" in review:
-            review["reply"] = review["author_response"]
-            review["replied_by"] = "manual"
-        else:
+        if mode == "auto":
             review["reply"] = generate_ai_reply(review.get("text", ""), lang)
             review["replied_by"] = "ai"
+        else:
+            review["reply"] = ""  # 手動入力フォーム表示用
+            review["replied_by"] = "manual"
 
     return templates.TemplateResponse("reviews.html", {
         "request": request,
         "reviews": reviews,
         "lang": lang,
+        "mode": mode
     })
-
-# Render動作確認用ルート
-@app.get("/", response_class=HTMLResponse)
-async def root():
-    return "<h2>ZAYRO is running. Go to <a href='/reviews?lang=ja'>/reviews</a></h2>"
