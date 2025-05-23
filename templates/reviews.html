@@ -1,36 +1,18 @@
 <!DOCTYPE html>
-<html lang="{{ 'ja' if lang == 'ja' else 'en' }}">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Googleレビュー</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8">
+  <title>Reviews</title>
 </head>
 <body>
-    <div class="lang-switch">
-        <a href="/?lang=ja&mode={{ mode }}">🇯🇵 日本語</a> | 
-        <a href="/?lang=en&mode={{ mode }}">🇺🇸 English</a>
-    </div>
-    <div class="mode-switch">
-        モード切替：
-        <a href="/?lang={{ lang }}&mode=ai">AI自動返信</a> |
-        <a href="/?lang={{ lang }}&mode=manual">手動返信</a>
-    </div>
-
-    <h1>{{ "Googleレビュー" if lang == "ja" else "Customer Reviews" }}</h1>
-
+  <h1>Review List</h1>
+  <ul>
     {% for review in reviews %}
-        <div class="review-card">
-            <h3>{{ review.author_name }} ★★★★★</h3>
-            <p>{{ review.text }}</p>
-
-            {% if mode == "ai" %}
-                <p><strong>Reply from us</strong><br>{{ replies[loop.index0] }}</p>
-            {% else %}
-                <p><strong>返信（下書き）：</strong></p>
-                <textarea placeholder="ここに返信を書いてください..." rows="3" cols="50"></textarea><br>
-                <button disabled>送信（未実装）</button>
-            {% endif %}
-        </div>
+      <li>
+        <strong>{{ review["Customer Name"] }}</strong> ({{ review["Review Date"] }})<br>
+        {{ review["Review Content"] }}
+      </li>
     {% endfor %}
+  </ul>
 </body>
 </html>
