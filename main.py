@@ -13,21 +13,23 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_API_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# 【この行を必ず入れる】
+# FastAPIアプリの初期化
 app = FastAPI()
-
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# ルートパス
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+# /reviews 表示
 @app.get("/reviews", response_class=HTMLResponse)
 async def read_reviews(request: Request):
     try:
         response = supabase.table("zayro_reviews").select("*").execute()
         reviews = response.data
+        print("取得データ:", reviews)
     except Exception as e:
         print("Supabase接続エラー:", e)
         reviews = []
