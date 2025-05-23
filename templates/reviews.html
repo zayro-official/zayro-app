@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Reviews</title>
+    <meta charset="UTF-8">
+    <title>Reviews</title>
 </head>
 <body>
-  <h1>Review List</h1>
-  <ul>
+    <h1>Review List</h1>
+    <ul>
     {% for review in reviews %}
-      <li>
-        <strong>{{ review["Customer Name"] }}</strong> ({{ review["Review Date"] }})<br>
-        {{ review["Review Content"] }}
-      </li>
+        <li>
+            <strong>{{ review["Customer Name"] }}</strong><br>
+            Date: {{ review["Review Date"] }}<br>
+            Content: {{ review["Review Content"] }}<br>
+            Platform: {{ review["Platform"] }}<br>
+            Rating: {{ review["Rating"] }}<br>
+            ----------------------------
+        </li>
     {% endfor %}
-  </ul>
+    </ul>
 </body>
 </html>
