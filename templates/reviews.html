@@ -7,14 +7,14 @@
 <body>
     <h1>Review List</h1>
     <ul>
-    {% for review in reviews %}
-        <li>
-            <strong>{{ review["Customer Name"] }}</strong> ({{ review["Review Date"] }})<br>
-            {{ review["Review Content"] }}
-        </li>
-    {% else %}
-        <li>No reviews available.</li>
-    {% endfor %}
+        {% for review in reviews %}
+            <li>
+                <strong>{{ review["Customer Name"] }}</strong> ({{ review["Review Date"] }})<br>
+                {{ review["ReviewContent"] }}
+            </li>
+        {% else %}
+            <li>No reviews available.</li>
+        {% endfor %}
     </ul>
 </body>
 </html>
