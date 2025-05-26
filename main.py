@@ -1,21 +1,18 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-templates = Jinja2Templates(directory="templates")
 
-@app.get("/reviews", response_class=HTMLResponse)
-async def read_reviews(request: Request):
-    reviews = [
-        {"Customer Name": "Emily Chen", "Review ID": "R001", "Review Date": "2025-05-20"},
-        {"Customer Name": "Jake Turner", "Review ID": "R002", "Review Date": "2025-06-14"},
-        {"Customer Name": "Sophia Martinez", "Review ID": "R003", "Review Date": "2025-05-21"},
-    ]
-    return templates.TemplateResponse("reviews.html", {"request": request, "reviews": reviews})
+# CORSを許可
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/generate")
-async def generate_reply(data: dict):
+async def generate_reply(request: Request):
+    data = await request.json()
     review_text = data.get("review", "")
-    reply = f"Thanks for your review! You said: {review_text}"
-    return JSONResponse(content={"reply": reply})
+    return {"reply": f"Thanks for your feedback: {review_text}"}
